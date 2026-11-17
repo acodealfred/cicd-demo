@@ -14,6 +14,7 @@ A minimal SwiftUI app used to exercise CI/CD. Simulator-only for now: no code si
 | `cicd-demo/Greeting.swift` | Pure greeting logic (unit tested) |
 | `cicd-demoTests/` | Unit test target `cicd-demoTests` (Swift Testing, hosted in the app) |
 | `.github/workflows/ci.yml` | GitHub Actions: build + test on every push / PR |
+| `scripts/test-summary.sh` | Turns an `.xcresult` into Markdown for the run's Summary page (uses `xcrun xcresulttool` + `jq`) |
 
 Folders are synchronized: files added under `cicd-demo/` or `cicd-demoTests/` join that target automatically.
 
@@ -44,6 +45,18 @@ Run unit tests:
 xcodebuild test -project cicd-demo.xcodeproj -scheme cicd-demo \
   -destination 'platform=iOS Simulator,name=iPhone 17' CODE_SIGNING_ALLOWED=NO
 ```
+
+Preview the CI test summary locally:
+
+```sh
+xcodebuild test ... -resultBundlePath build/TestResults.xcresult
+scripts/test-summary.sh build/TestResults.xcresult
+```
+
+## CI artifacts (kept 14 days)
+
+- `TestResults`: zipped `TestResults.xcresult`, uploaded on every run; unzip and open in Xcode.
+- `cicd-demo-simulator-app`: zipped unsigned Release `cicd-demo.app` for the iOS Simulator, uploaded only when tests pass.
 
 ## Conventions
 
