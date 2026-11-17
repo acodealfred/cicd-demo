@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & test (iOS Simulator)
+    # Preview image with Xcode 27.x. macos-latest / macos-26 only ship Xcode 26,
+    # which has no iOS 27 SDK. See https://github.com/actions/runner-images
+    runs-on: xcode-27
+    timeout-minutes: 30
+    env:
+      # Pin Xcode 27.2 (image default is 27.1). The app's deployment target is 27.2.
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
+      SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=27.2
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Show toolchain and project
+        # Fails fast if the image's Xcode can't read the project file.
+        run: |
+          xcodebuild -version
+          xcodebuild -list -project cicd-demo.xcodeproj
+
+      - name: Build and run tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project cicd-demo.xcodeproj \
+            -scheme cicd-demo \
+            -destination "$SIMULATOR_DESTINATION" \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResults.xcresult
+          if-no-files-found: ignore

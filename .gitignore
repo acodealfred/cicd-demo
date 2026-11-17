@@ -1,0 +1,10 @@
+# Xcode user state (shared schemes live in xcshareddata and ARE committed)
+xcuserdata/
+
+# Build output
+DerivedData/
+build/
+*.xcresult
+
+# macOS
+.DS_Store
