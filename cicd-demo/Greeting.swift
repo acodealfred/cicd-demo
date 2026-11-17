@@ -6,6 +6,6 @@ nonisolated enum Greeting {
     /// with surrounding whitespace trimmed.
     static func message(for name: String?) -> String {
         let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? "Hello, Alfred!" : "Hello, \(trimmed)!"
+        return trimmed.isEmpty ? "Hello, world!" : "Hello, \(trimmed)!"
     }
 }
